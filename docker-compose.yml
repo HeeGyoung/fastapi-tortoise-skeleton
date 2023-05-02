@@ -1,0 +1,82 @@
+#!
+services:
+  test-db:
+    image: mysql:8-debian
+    platform: linux/amd64
+    container_name: test_db
+    ports:
+      - 33060:3306
+    networks:
+      - local_network
+    environment:
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqluser
+      MYSQL_ROOT_PASSWORD: mysqluser
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_unicode_ci
+      - --general-log=1
+      - --general_log_file=/var/log/mysql/general.log
+      - --log_error=/var/log/mysql/error.log
+      - --default-time-zone=+09:00
+    volumes:
+      - test-db:/var/lib/mysql
+      - ./tests/init_db/:/docker-entrypoint-initdb.d
+  local-db:
+    image: mysql:8-debian
+    platform: linux/amd64
+    container_name: local_db
+    ports:
+      - 3306:3306
+    networks:
+      - local_network
+    environment:
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqluser
+      MYSQL_ROOT_PASSWORD: mysqluser
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_unicode_ci
+      - --general-log=1
+      - --general_log_file=/var/log/mysql/general.log
+      - --log_error=/var/log/mysql/error.log
+      - --default-time-zone=+09:00
+    volumes:
+      - local-db:/var/lib/mysql
+      - ./config/init_db/:/docker-entrypoint-initdb.d
+  web:
+    build:
+      context: .
+      target: local
+    entrypoint: ./local_entrypoint.sh
+    container_name: fastapi-tortoise-skeleton
+    restart: always
+    ports:
+      - 8005:8005
+    networks:
+      - local_network
+    volumes:
+      - ./:/backend
+    depends_on:
+      - local-db
+      - test-db
+  test-web:
+    build:
+      context: .
+      target: local
+    entrypoint: ./test_entrypoint.sh
+    container_name: admin_test
+    restart: always
+    ports:
+      - 8005:8005
+    networks:
+      - local_network
+    volumes:
+      - ./:/backend
+    depends_on:
+      - test-db
+volumes:
+  local-db:
+  test-db:
+networks:
+  local_network:
