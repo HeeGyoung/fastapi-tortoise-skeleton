@@ -20,9 +20,9 @@ TORTOISE_ORM = {
             "models": [
                 "aerich.models",
                 "models.event",
-                "models.user_account",
                 "models.user_order",
                 "models.user",
+                "models.admin_user",
             ],
             "default_connection": "default",
         },

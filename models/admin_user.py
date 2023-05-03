@@ -4,6 +4,7 @@ from models.common import TimeStampMixin
 
 
 class AdminUser(Model, TimeStampMixin):
-    id: str = fields.CharField(pk=True, max_length=50)
-    password: str = fields.CharField(max_length=64, null=True)
-    role: str = fields.CharField(max_length=64, null=True)
+    id: int = fields.IntField(pk=True)
+    username: str = fields.CharField(max_length=10)
+    password: str = fields.CharField(max_length=60)
+    role: str = fields.CharField(max_length=10)

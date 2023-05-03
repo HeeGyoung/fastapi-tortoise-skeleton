@@ -4,9 +4,7 @@ import pytest
 from httpx import AsyncClient
 
 from schemas.response.order_list_response import OrderListResponse
-from services.enums.currency import Currency
 from services.enums.order_status import OrderStatus
-from services.enums.user_account import AccountType
 from tests.utils.decorator import set_db
 
 
@@ -23,14 +21,12 @@ class TestGetOrder:
                 "user_mobile": "01012341234",
             },
             account={
-                "account_type": AccountType.DOM,
+                "account_type": "DOM",
                 "account_number": "12341234",
             },
             order={
                 "status": OrderStatus.REQUEST.value,
                 "order_date": "2022-11-01 11:00:00",
-                "from_cur": Currency.KRW,
-                "to_cur": Currency.USD,
                 "from_amount": 1000000,
                 "to_amount": 1000000,
             },

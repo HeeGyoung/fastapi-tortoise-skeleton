@@ -11,21 +11,17 @@ def get_user_order_condition(form_data: OrderListRequest):
     }
     if form_data.order_status:
         kwargs["status"] = form_data.order_status
-    if form_data.currency:
-        kwargs["from_cur"] = form_data.currency
     if form_data.order_id:
-        kwargs["order_id"] = form_data.order_id
+        kwargs["id"] = form_data.order_id
     return kwargs
 
 
 def get_user_condition(form_data: OrderListRequest):
     kwargs = {}
     if form_data.user_id:
-        kwargs["user__user_id"] = form_data.user_id
-    if form_data.user_name:
-        kwargs["user__user_name"] = form_data.user_name
-    if form_data.user_eng_name:
-        kwargs["user__user_eng_name"] = form_data.user_eng_name
+        kwargs["user__id"] = form_data.user_id
+    if form_data.username:
+        kwargs["user__username"] = form_data.username
     return kwargs
 
 
@@ -34,23 +30,12 @@ async def get_order_list(form_data: OrderListRequest):
         **get_user_condition(form_data),
         **get_user_order_condition(form_data),
     ).values(
-        "order_id",
+        "id",
         "order_date",
         "status",
-        "from_cur",
-        "from_amount",
-        "to_cur",
-        "to_amount",
-        "standard_rate",
-        user_id="user__user_id",
-        user_name="user__user_name",
-        user_eng_name="user__user_eng_name",
-        user_mobile="user__user_mobile",
-        account_type="user_account__account_type",
-        bank_code="user_account__bank_code",
-        bank_name="user_account__bank_name",
-        account_number="user_account__account_number",
-        account_holder="user_account__account_holder",
-        alias="user_account__alias",
+        "amount",
+        "complete_date",
+        user_id="user__id",
+        user_name="user__username",
     )
     return orders

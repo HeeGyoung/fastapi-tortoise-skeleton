@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends
+from fastapi import Depends, Path
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from config.settings import settings
 from models.admin_user import AdminUser
+from models.user import User
 from schemas.response.token_response import TokenResponse
 from services.exceptions.custom_execptions import (
     ForbiddenException,
@@ -16,11 +17,12 @@ from services.exceptions.custom_execptions import (
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="login", scopes={"USER": "user", "MASTER": "master"}
+    tokenUrl="login", scopes={"DEV": "dev", "MANAGER": "manager", "MASTER": "master"}
 )
+
 crypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ACCESS_TOKEN_EXPIRE_DAY = 1
-SIGN_ALGORITHM = "HS256"
+ALGORITHM = "HS256"
 
 MSG_NOT_AUTHORIZED = "Not authorized user"
 MSG_USER_ID_NOT_FOUND = "User id not found"
@@ -42,22 +44,30 @@ def get_hashed_password(password: str) -> str:
 
 
 async def get_admin_user(username: str) -> AdminUser:
-    return await AdminUser.get(id=username)
+    return await AdminUser.get(username=username)
 
 
 def verify_password(password: str, compare_password: str) -> bool:
     return crypt_context.verify(password, compare_password)
 
 
-def create_token(admin_user: AdminUser) -> dict:
-    data = Token(
-        user_id=admin_user.id,
-        role=admin_user.role,
-        expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
-    ).dict()
+def create_token(user: AdminUser | User) -> dict:
+    user_type = type(user)
+    if user_type is AdminUser:
+        data = Token(
+            user_id=user.id,
+            role=user.role,
+            expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
+        ).dict()
+    elif user_type is User:
+        data = Token(
+            user_id=user.username,
+            role=user.account_level,
+            expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
+        ).dict()
 
     return TokenResponse(
-        access_token=jwt.encode(data, settings.TOKEN_KEY, algorithm=SIGN_ALGORITHM),
+        access_token=jwt.encode(data, settings.TOKEN_KEY, algorithm=ALGORITHM),
         token_type="bearer",
     ).dict()
 
@@ -66,7 +76,7 @@ async def authorized(
     security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
 ) -> Token:
     try:
-        payload = jwt.decode(token, settings.TOKEN_KEY, algorithms=[SIGN_ALGORITHM])
+        payload = jwt.decode(token, settings.TOKEN_KEY, algorithms=[ALGORITHM])
         user_id: Optional[str] = payload.get("user_id")
         if not user_id:
             raise UnauthorizedException(MSG_USER_ID_NOT_FOUND)
