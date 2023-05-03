@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class AdminUserResponse(BaseModel):
-    id: str
+    username: str
     role: str
 
     class Config:

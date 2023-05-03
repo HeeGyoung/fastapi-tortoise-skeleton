@@ -1,6 +1,5 @@
 import pytest
 
-from models.order_manager import OrderManager
 from models.user import User
 from models.user_order import UserOrder
 
@@ -15,9 +14,6 @@ async def create_order_data_with_relations():
         created_order = await UserOrder.create(
             user=created_user, user_account=created_account, **order
         )
-        created_manager = await OrderManager.create(
-            order_id=created_order.order_id, **manager
-        )
-        return created_user, created_account, created_order, created_manager
+        return created_user, created_account, created_order
 
     return _create_data

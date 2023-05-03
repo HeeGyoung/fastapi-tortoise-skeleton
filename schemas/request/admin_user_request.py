@@ -4,7 +4,7 @@ from services.login.auth import get_hashed_password
 
 
 class AdminUserRequest(BaseModel):
-    id: str
+    username: str
     password: str
     role: str
 

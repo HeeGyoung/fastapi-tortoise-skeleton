@@ -11,12 +11,11 @@ from tests.utils.decorator import set_db
 
 
 @pytest.mark.anyio
-@set_db("admin")
 class TestAdminUser:
     def _get_admin_user_request(
-        self, user_id: str = "test", password: str = "test", role: str = "USER"
+        self, username: str = "test", password: str = "test", role: str = "USER"
     ):
-        return AdminUserRequest(id=user_id, password=password, role=role)
+        return AdminUserRequest(username=username, password=password, role=role)
 
     async def test_admin_user_request_form_should_password_hash(self):
         # Given: Set AdminUserRequest form with test password
@@ -40,7 +39,7 @@ class TestAdminUser:
         assert created_user.password == admin_request.password
         assert created_user.role == admin_request.role
         assert await AdminUser.exists(
-            id=admin_request.id,
+            username=admin_request.username,
             password=admin_request.password,
             role=admin_request.role,
         )
@@ -50,7 +49,7 @@ class TestAdminUser:
         admin_request = self._get_admin_user_request()
 
         # When: Try to create admin user
-        response = await client.post("/admin/user", json=admin_request.dict())
+        response = await client.post("/admin", json=admin_request.dict())
 
         # Then: 401 UNAUTHORIZED returned
         assert response.status_code == http.HTTPStatus.UNAUTHORIZED
@@ -64,7 +63,7 @@ class TestAdminUser:
 
         # When: Try to create admin user
         response = await client.post(
-            "/admin/user",
+            "/admin",
             json=admin_request.dict(),
             headers={"Authorization": f"Bearer {user_token}"},
         )
@@ -80,7 +79,7 @@ class TestAdminUser:
 
         # When: Try to create admin user
         response = await client.post(
-            "/admin/user",
+            "/admin",
             json=new_admin_user.dict(),
             headers={
                 "Authorization": f"Bearer {master_token}",
@@ -90,4 +89,4 @@ class TestAdminUser:
 
         # Then: 200 OK and admin user created
         assert response.status_code == http.HTTPStatus.OK
-        assert await AdminUser.exists(id=new_admin_user.id)
+        assert await AdminUser.exists(username=new_admin_user.username)

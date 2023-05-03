@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 from config.settings import settings
 from models.admin_user import AdminUser
-from models.user import User
 from schemas.response.token_response import TokenResponse
 from services.exceptions.custom_execptions import (
     ForbiddenException,
@@ -34,7 +33,7 @@ MSG_INVALID_TOKEN = "Invalid token"
 
 
 class Token(BaseModel):
-    user_id: str
+    username: str
     role: str
     expire: float
 
@@ -51,21 +50,12 @@ def verify_password(password: str, compare_password: str) -> bool:
     return crypt_context.verify(password, compare_password)
 
 
-def create_token(user: AdminUser | User) -> dict:
-    user_type = type(user)
-    if user_type is AdminUser:
-        data = Token(
-            user_id=user.id,
-            role=user.role,
-            expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
-        ).dict()
-    elif user_type is User:
-        data = Token(
-            user_id=user.username,
-            role=user.account_level,
-            expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
-        ).dict()
-
+def create_token(user: AdminUser) -> dict:
+    data = Token(
+        username=user.username,
+        role=user.role,
+        expire=(datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)).timestamp(),
+    ).dict()
     return TokenResponse(
         access_token=jwt.encode(data, settings.TOKEN_KEY, algorithm=ALGORITHM),
         token_type="bearer",
@@ -77,7 +67,7 @@ async def authorized(
 ) -> Token:
     try:
         payload = jwt.decode(token, settings.TOKEN_KEY, algorithms=[ALGORITHM])
-        user_id: Optional[str] = payload.get("user_id")
+        user_id: Optional[str] = payload.get("username")
         if not user_id:
             raise UnauthorizedException(MSG_USER_ID_NOT_FOUND)
         token_expire: Optional[float] = payload.get("expire")

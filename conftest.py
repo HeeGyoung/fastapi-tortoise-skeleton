@@ -37,9 +37,9 @@ async def initialize():
 
 @pytest.fixture
 def get_token():
-    def _get_token(id: str = "test", password: str = "test", role: str = "USER"):
+    def _get_token(username: str = "test", password: str = "test", role: str = "USER"):
         admin_user = AdminUser(
-            id=id,
+            username=username,
             password=password,
             role=role,
         )
