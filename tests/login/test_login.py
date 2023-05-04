@@ -12,7 +12,7 @@ from models.admin_user import AdminUser
 from services.login.auth import (
     ACCESS_TOKEN_EXPIRE_DAY,
     MSG_NOT_AUTHORIZED,
-    SIGN_ALGORITHM,
+    ALGORITHM,
     Token,
     crypt_context,
     get_hashed_password,
@@ -21,19 +21,19 @@ from tests.utils.decorator import set_db
 
 
 @pytest.mark.anyio
-@set_db("admin")
+@set_db("default")
 class TestLogin:
     async def _create_admin_user(
-        self, id: str = "test", password: str = "test", role: str = "USER"
+        self, username: str = "test", password: str = "test", role: str = "USER"
     ):
-        return await AdminUser.create(id=id, password=password, role=role)
+        return await AdminUser.create(username=username, password=password, role=role)
 
     async def test_login_with_not_exist_user(self, client: AsyncClient):
         # Given: Not create admin user
         # When: Try to login
         response = await client.post(
             "/login",
-            data={"username": "not_exist_user_id", "password": "test_password"},
+            data={"username": "not_exist", "password": "test_password"},
             headers={"accept": "application/json"},
         )
         # Then: AdminUser DoesNotExist return
@@ -48,7 +48,7 @@ class TestLogin:
         with pytest.raises(UnknownHashError):
             await client.post(
                 "/login",
-                data={"username": admin_user.id, "password": admin_user.password},
+                data={"username": admin_user.username, "password": admin_user.password},
                 headers={"accept": "application/json"},
             )
 
@@ -61,7 +61,7 @@ class TestLogin:
         wrong_password = "forgot_password"
         response = await client.post(
             "/login",
-            data={"username": admin_user.id, "password": wrong_password},
+            data={"username": admin_user.username, "password": wrong_password},
             headers={"accept": "application/json"},
         )
 
@@ -81,12 +81,12 @@ class TestLogin:
             # When: Try to login
             response = await client.post(
                 "/login",
-                data={"username": admin_user.id, "password": password},
+                data={"username": admin_user.username, "password": password},
                 headers={"accept": "application/json"},
             )
 
             token_data = Token(
-                user_id=admin_user.id,
+                username=admin_user.username,
                 role=admin_user.role,
                 expire=(
                     datetime.now() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAY)
@@ -95,7 +95,7 @@ class TestLogin:
 
         # Then: OK and token returned
         expected_token = jwt.encode(
-            token_data, settings.TOKEN_KEY, algorithm=SIGN_ALGORITHM
+            token_data, settings.TOKEN_KEY, algorithm=ALGORITHM
         )
         assert response.status_code == http.HTTPStatus.OK
         assert response.json()["access_token"] == expected_token
