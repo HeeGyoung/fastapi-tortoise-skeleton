@@ -1,6 +1,4 @@
-import time
-
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Security
 
 from models.user import User
 from services.login.auth import authorized

@@ -10,7 +10,7 @@ class User(Model, TimeStampMixin):
     username: str = fields.CharField(max_length=10)
     password: str = fields.CharField(max_length=60)
     account_level: AccountLevel = fields.CharEnumField(enum_type=AccountLevel)
-    status: AccountStatus = fields.BooleanField(
+    status: BooleanField = fields.BooleanField(
         enum_type=AccountStatus, default=AccountStatus.ACTIVE
     )
     authenticated: AccountAuthenticated = fields.CharEnumField(
