@@ -5,7 +5,7 @@ from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
 from config.settings import TORTOISE_ORM, settings
-from routers import event, login, order, user, admin_user
+from routers import admin_user, event, login, order, user
 from services.exceptions.handler import (
     does_not_exist_handler,
     pydantic_validation_error_handler,
