@@ -36,6 +36,6 @@ async def get_order_list(form_data: OrderListRequest):
         "amount",
         "complete_date",
         user_id="user__id",
-        user_name="user__username",
+        username="user__username",
     )
     return orders

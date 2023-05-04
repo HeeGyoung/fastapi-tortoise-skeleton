@@ -9,8 +9,8 @@ class OrderListResponse(BaseModel):
     id: int
     order_date: datetime
     status: OrderStatus
-    user_id: str
-    user_name: str
+    user_id: int
+    username: str
     amount: float
     complete_date: datetime
 

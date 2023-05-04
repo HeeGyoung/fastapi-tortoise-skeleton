@@ -10,6 +10,6 @@ class OrderListRequest(BaseModel):
     start_date: datetime
     end_date: datetime
     order_status: Optional[OrderStatus] = None
-    user_id: Optional[str] = None
+    user_id: Optional[int] = None
     username: Optional[str] = None
     order_id: Optional[int] = None
