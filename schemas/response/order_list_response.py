@@ -13,4 +13,3 @@ class OrderListResponse(BaseModel):
     username: str
     amount: float
     complete_date: datetime
-

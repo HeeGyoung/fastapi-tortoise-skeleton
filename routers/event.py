@@ -8,7 +8,11 @@ from services.login.auth import authorized
 router = APIRouter(prefix="/event", tags=["Event"])
 
 
-@router.post("", response_model=EventResponse, dependencies=[Security(authorized, scopes=["MASTER"])])
+@router.post(
+    "",
+    response_model=EventResponse,
+    dependencies=[Security(authorized, scopes=["MASTER"])],
+)
 async def create_event(event: EventRequest):
     return EventResponse.from_orm(await Event.create(**event.dict()))
 

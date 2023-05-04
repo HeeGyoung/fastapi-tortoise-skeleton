@@ -15,9 +15,7 @@ class UserOrder(Model, TimeStampMixin):
     status: OrderStatus = fields.CharEnumField(max_length=20, enum_type=OrderStatus)
     order_date: datetime = fields.DatetimeField(index=True)
     complete_date: datetime = fields.DatetimeField(null=True)
-    amount: Decimal = fields.DecimalField(
-        max_digits=10, decimal_places=3, default=0
-    )
+    amount: Decimal = fields.DecimalField(max_digits=10, decimal_places=3, default=0)
 
     class Meta:
         ordering = ["-id"]

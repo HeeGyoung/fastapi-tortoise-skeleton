@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 from schemas.response.order_list_response import OrderListResponse
 from services.enums.order_status import OrderStatus
-from services.enums.user import AccountLevel, AccountAuthenticated
+from services.enums.user import AccountAuthenticated, AccountLevel
 from services.login.auth import get_hashed_password
 from tests.utils.decorator import set_db
 
@@ -20,7 +20,7 @@ class TestGetOrder:
                 "password": get_hashed_password("password"),
                 "account_level": AccountLevel.SILVER.value,
                 "status": 1,
-                "authenticated": AccountAuthenticated.SNS.value
+                "authenticated": AccountAuthenticated.SNS.value,
             },
             order={
                 "status": OrderStatus.REQUEST.value,
@@ -65,9 +65,7 @@ class TestGetOrder:
         self, client: AsyncClient, get_token, create_order_data_with_relations
     ):
         # Given: create user, account, order, manager
-        user, order = await self._create_simple_data(
-            create_order_data_with_relations
-        )
+        user, order = await self._create_simple_data(create_order_data_with_relations)
 
         # When: Try to get order list
         response = await self._call_order_list_api(
@@ -91,9 +89,7 @@ class TestGetOrder:
         self, client: AsyncClient, get_token, create_order_data_with_relations
     ):
         # Given: create user, account, order, manager
-        user, order = await self._create_simple_data(
-            create_order_data_with_relations
-        )
+        user, order = await self._create_simple_data(create_order_data_with_relations)
 
         # When: Try to get order list
         response = await self._call_order_list_api(

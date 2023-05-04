@@ -11,8 +11,8 @@ from config.settings import settings
 from models.admin_user import AdminUser
 from services.login.auth import (
     ACCESS_TOKEN_EXPIRE_DAY,
-    MSG_NOT_AUTHORIZED,
     ALGORITHM,
+    MSG_NOT_AUTHORIZED,
     Token,
     crypt_context,
     get_hashed_password,
@@ -94,8 +94,6 @@ class TestLogin:
             ).dict()
 
         # Then: OK and token returned
-        expected_token = jwt.encode(
-            token_data, settings.TOKEN_KEY, algorithm=ALGORITHM
-        )
+        expected_token = jwt.encode(token_data, settings.TOKEN_KEY, algorithm=ALGORITHM)
         assert response.status_code == http.HTTPStatus.OK
         assert response.json()["access_token"] == expected_token
