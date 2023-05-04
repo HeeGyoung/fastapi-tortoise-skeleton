@@ -24,7 +24,7 @@ ACCESS_TOKEN_EXPIRE_DAY = 1
 ALGORITHM = "HS256"
 
 MSG_NOT_AUTHORIZED = "Not authorized user"
-MSG_USER_ID_NOT_FOUND = "User id not found"
+MSG_USERNAME_NOT_FOUND = "Username not found"
 MSG_TOKEN_EXPIRE_NOT_FOUND = "Expire not found"
 MSG_TOKEN_EXPIRED = "Token expired"
 MSG_USER_ROLE_NOT_FOUND = "Role not found"
@@ -69,7 +69,7 @@ async def authorized(
         payload = jwt.decode(token, settings.TOKEN_KEY, algorithms=[ALGORITHM])
         user_id: Optional[str] = payload.get("username")
         if not user_id:
-            raise UnauthorizedException(MSG_USER_ID_NOT_FOUND)
+            raise UnauthorizedException(MSG_USERNAME_NOT_FOUND)
         token_expire: Optional[float] = payload.get("expire")
         if not token_expire:
             raise UnauthorizedException(MSG_TOKEN_EXPIRE_NOT_FOUND)

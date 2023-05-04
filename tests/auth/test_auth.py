@@ -16,9 +16,9 @@ from services.login.auth import (
     MSG_INVALID_TOKEN,
     MSG_TOKEN_EXPIRE_NOT_FOUND,
     MSG_TOKEN_EXPIRED,
-    MSG_USER_ID_NOT_FOUND,
+    MSG_USERNAME_NOT_FOUND,
     MSG_USER_ROLE_NOT_FOUND,
-    SIGN_ALGORITHM,
+    ALGORITHM,
     authorized,
 )
 
@@ -39,20 +39,20 @@ class TestAuth:
         # Given: Token without user_id
         scopes = SecurityScopes()
         data = {"role": "USER", "expire": datetime.now().timestamp()}
-        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=SIGN_ALGORITHM)
+        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=ALGORITHM)
 
         # When: Try to check authorize
         # Then: HTTPException(HTTP_401_UNAUTHORIZED) raise with user id not found detail
         with pytest.raises(UnauthorizedException) as e:
             await authorized(security_scopes=scopes, token=token)
         assert e.value.status_code == http.HTTPStatus.UNAUTHORIZED
-        assert e.value.detail == MSG_USER_ID_NOT_FOUND
+        assert e.value.detail == MSG_USERNAME_NOT_FOUND
 
     async def test_authorized_without_expire(self):
         # Given: Token without "expire" key
         scopes = SecurityScopes()
-        data = {"user_id": "test", "role": "USER"}
-        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=SIGN_ALGORITHM)
+        data = {"username": "test", "role": "USER"}
+        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=ALGORITHM)
 
         # When: Try to check authorize
         # Then: HTTPException(HTTP_401_UNAUTHORIZED) raise with expire not found detail
@@ -78,10 +78,10 @@ class TestAuth:
         # Given: Token without role
         scopes = SecurityScopes()
         data = {
-            "user_id": "test",
+            "username": "test",
             "expire": (datetime.now() + timedelta(days=1)).timestamp(),
         }
-        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=SIGN_ALGORITHM)
+        token = jwt.encode(data, settings.TOKEN_KEY, algorithm=ALGORITHM)
 
         # When: Try to check authorize
         # Then: HTTPException(HTTP_401_UNAUTHORIZED) raise with role not found detail
