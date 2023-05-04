@@ -11,6 +11,7 @@ from tests.utils.decorator import set_db
 
 
 @pytest.mark.anyio
+@set_db("default")
 class TestAdminUser:
     def _get_admin_user_request(
         self, username: str = "test", password: str = "test", role: str = "USER"

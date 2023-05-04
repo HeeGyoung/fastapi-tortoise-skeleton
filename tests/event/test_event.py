@@ -9,13 +9,13 @@ from tests.utils.decorator import set_db
 
 
 @pytest.mark.anyio
-@set_db("exchange")
+@set_db("default")
 class TestEvent:
-    async def test_create_event(self, client: AsyncClient):
+    async def test_create_event(self, client: AsyncClient, get_token):
         # Given: Event data
         data: Optional[Dict[Any, Any]] = {
-            "start_date": "2022-10-04 00:00:00",
-            "end_date": "2022-10-05 23:59:59",
+            "start_date": "2023-05-04 00:00:00",
+            "end_date": "2023-05-05 23:59:59",
             "title": "test event",
             "is_display": True,
             "page_url": "https://test.com",
@@ -24,10 +24,16 @@ class TestEvent:
             "list_image_url": "https://test.com",
             "is_delete": False,
         }
+        master_token = get_token(role="MASTER")
+
         # When: Try to create new event
         response = await client.post(
             "/event",
             json=data,
+            headers={
+                "Authorization": f"Bearer {master_token}",
+                "accept": "application/json",
+            },
         )
         # Then: response status is 200, the data is created and the transaction
         # will rollback.
