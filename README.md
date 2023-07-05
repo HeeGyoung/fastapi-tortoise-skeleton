@@ -9,7 +9,7 @@ TOKEN_KEY="UDg8RZIWnnOgXf2SWemX0V+4mcSrN5Nyu2MjLKwwJJQ="
 AES_KEY="testaeskey"
 >
 
-### Pycharm 환경 설정
+### Pycharm settings
 1. Go to Pycharm > Preference > Build, Execution, Development > Docker, add docker.
 
 2. Open "Interpreter settings" then click Add interpreter > On docker compose.
